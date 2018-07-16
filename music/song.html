@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Publish Song</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+    <script src="http://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    
+</head>
+<body>
+     <div class="container">
+
+        <h1>Publish Song</h1>
+        <span id="countIns"></span>
+
+        <h2 id="instructor"></h2>
+        <span id="insTrans"></span>
+        <hr>
+
+        <img id="loader" src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif">
+
+        <label for="song" class="col-lg-2 control-label">Song Name</label>
+        <input id="song" type="text">
+
+        <label for="artist" class="col-lg-2 control-label">Artist Name</label>
+        <input id="artist" type="text">
+         
+        <label for="record" class="col-lg-2 control-label">Record Company Name</label>
+        <input id="record" type="text">
+
+        <button id="button">Publish</button>
+
+    </div>
+    
+        <script>
+
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            // set the provider you want from Web3.providers
+            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+        }
+        
+         web3.eth.defaultAccount = web3.eth.accounts[0];
+            
+
+   var musicContract = web3.eth.contract([{"constant":false,"inputs":[{"name":"_entity","type":"bytes32"}],"name":"getAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"bytes32"}],"name":"songs","outputs":[{"name":"artist","type":"address"},{"name":"recordCompany","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_address","type":"address"},{"name":"_entity","type":"bytes32"}],"name":"setAddress","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_sname","type":"bytes32"}],"name":"getSong","outputs":[{"name":"","type":"address"},{"name":"","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_sname","type":"bytes32"},{"name":"_artist","type":"bytes32"},{"name":"_recordComp","type":"bytes32"}],"name":"setSong","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"bytes32"}],"name":"accounts","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"s","type":"bytes32"}],"name":"transferPayment","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"entity","type":"bytes32"}],"name":"info","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_sname","type":"bytes32"}],"name":"published","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_artist","type":"address"},{"indexed":false,"name":"_recComp","type":"address"}],"name":"transfered","type":"event"}]);
+
+
+       
+        var User = musicContract.at('0x648a01c97ded7f20819aa8f2fd7d8c4119a671e8');
+        console.log(User);
+        
+        
+        
+        var userEvent = User.published({},'latest');
+            
+        userEvent.watch(function (err, result) {
+            console.log("event!!!!");
+    if (!err) {
+        if (result.blockHash != $("#instrans").html()) 
+            $("#loader").hide();
+            $("#instructor").html("Song pushlished!");
+//        $("#insTrans").html('Block hash: ' +result.blockHash);
+//        $("#instructor").html((result.args._sname));
+    } else {
+        $("#loader").hide();
+    }
+});
+           
+      
+            $("#button").click(function() {
+    $("#loader").show();
+    User.setSong( $("#song").val(), $("#artist").val(), $("#record").val(), (err, res) => {
+        if (err) 
+            $("#loader").hide();
+        console.log("set!!");
+});
+                
+            });
+                
+         
+
+
+    </script>
+
+</body>
+</html>
